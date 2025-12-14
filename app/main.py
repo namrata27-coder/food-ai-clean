@@ -5,6 +5,8 @@ import os
 
 from app.yolo_model import detect_items
 from app.recipe_generator import generate_recipe
+from fastapi.middleware.cors import CORSMiddleware
+
 
 # from dotenv import load_dotenv
 # load_dotenv()
@@ -20,6 +22,13 @@ load_dotenv(dotenv_path=ENV_PATH)
 
 
 app = FastAPI(title="AI Food Recognition & Recipe API")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "temp")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
