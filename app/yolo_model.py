@@ -1,10 +1,10 @@
 from ultralytics import YOLO
 from pathlib import Path
-import cv2
 
-MODEL_PATH = Path("models/food_small_best.pt")
+BASE_DIR = Path(__file__).resolve().parent
+MODEL_PATH = BASE_DIR / "models" / "food_small_best.pt"
 
-model = YOLO(MODEL_PATH.as_posix())
+model = YOLO(str(MODEL_PATH))
 
 def detect_items(image_path: str):
     results = model(image_path)
