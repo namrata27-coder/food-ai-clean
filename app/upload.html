@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Food AI – Upload Image</title>
+</head>
+<body>
+  <h2>Upload food images</h2>
+
+  <form id="uploadForm">
+    <input type="file" id="images" multiple accept="image/*" />
+    <br><br>
+    <button type="submit">Generate Recipe</button>
+  </form>
+
+  <pre id="result"></pre>
+
+  <script>
+    const form = document.getElementById("uploadForm");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const files = document.getElementById("images").files;
+      const formData = new FormData();
+
+      for (let file of files) {
+        formData.append("images", file);
+      }
+
+      const response = await fetch("/detect-and-generate", {
+        method: "POST",
+        body: formData
+      });
+
+      const data = await response.json();
+      document.getElementById("result").textContent =
+        JSON.stringify(data, null, 2);
+    });
+  </script>
+</body>
+</html>
