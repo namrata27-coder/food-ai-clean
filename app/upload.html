@@ -1,40 +1,148 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Food AI – Upload Image</title>
+  <meta charset="UTF-8" />
+  <title>Food AI – Upload Images</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #f9fafb, #eef2f7);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      background: #ffffff;
+      padding: 24px;
+      border-radius: 14px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    }
+
+    h2 {
+      margin-top: 0;
+      text-align: center;
+      color: #111827;
+    }
+
+    p {
+      text-align: center;
+      color: #6b7280;
+      font-size: 14px;
+    }
+
+    input[type="file"] {
+      width: 100%;
+      margin-top: 16px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+    }
+
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      background: #2563eb;
+      color: #ffffff;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    button:disabled {
+      background: #93c5fd;
+      cursor: not-allowed;
+    }
+
+    pre {
+      margin-top: 20px;
+      background: #f3f4f6;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      max-height: 300px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .loading {
+      text-align: center;
+      margin-top: 12px;
+      color: #2563eb;
+      font-weight: 500;
+    }
+  </style>
 </head>
+
 <body>
-  <h2>Upload food images</h2>
+  <div class="card">
+    <h2>🍽️ Food AI</h2>
+    <p>Upload one or more food images to get a recipe</p>
 
-  <form id="uploadForm">
-    <input type="file" id="images" multiple accept="image/*" />
-    <br><br>
-    <button type="submit">Generate Recipe</button>
-  </form>
+    <form id="uploadForm">
+      <input type="file" id="images" multiple accept="image/*" />
+      <button type="submit" id="submitBtn">Generate Recipe</button>
+    </form>
 
-  <pre id="result"></pre>
+    <div id="loading" class="loading" style="display: none;">
+      Detecting food & generating recipe…
+    </div>
+
+    <pre id="result"></pre>
+  </div>
 
   <script>
     const form = document.getElementById("uploadForm");
+    const submitBtn = document.getElementById("submitBtn");
+    const loading = document.getElementById("loading");
+    const result = document.getElementById("result");
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
 
       const files = document.getElementById("images").files;
-      const formData = new FormData();
+      if (!files.length) {
+        alert("Please select at least one image");
+        return;
+      }
 
+      const formData = new FormData();
       for (let file of files) {
         formData.append("images", file);
       }
 
-      const response = await fetch("/detect-and-generate", {
-        method: "POST",
-        body: formData
-      });
+      submitBtn.disabled = true;
+      loading.style.display = "block";
+      result.textContent = "";
 
-      const data = await response.json();
-      document.getElementById("result").textContent =
-        JSON.stringify(data, null, 2);
+      try {
+        const response = await fetch("/detect-and-generate", {
+          method: "POST",
+          body: formData
+        });
+
+        const data = await response.json();
+        result.textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        result.textContent = "Error: " + err.message;
+      } finally {
+        submitBtn.disabled = false;
+        loading.style.display = "none";
+      }
     });
   </script>
 </body>
